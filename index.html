@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verb Simplification</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://unpkg.com/compromise@13.11.3/builds/compromise.min.js"></script>
+    <script src="task_embedding.js"></script>
+</head>
+
+
+<body>
+        <div class="container">
+            <h1>Verb Simplification using Word Embedding with GloVe 300d model</h1>
+            
+            <div id="training-message-embedding" class="alert">Model is being trained, please wait...</div>
+            
+            <div class="input-group">
+                <label for="sentence-input-embedding">Enter a sentence:</label>
+                <input type="text" id="sentence-input-embedding" placeholder="Type your sentence here...">
+            </div>
+            
+            <button id="simplify-button-embedding" onclick="simplifyInputSentenceEmbedded()">Simplify Sentence</button>
+            
+            <div class="output-group">
+                <p><strong>Original Sentence:</strong> <span id="original-sentence-embedding"></span></p>
+                <p><strong>Simplified Sentence:</strong> <span id="simplified-sentence-embedding"></span></p>
+            </div>
+        </div>
+
+</body>
+</html>
