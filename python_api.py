@@ -7,8 +7,7 @@ import gensim.downloader as api
 import re
 import spacy
 from difflib import get_close_matches
-import ssl
-from waitress import serve  # Import serve from waitress
+
 
 app = Flask(__name__)
 CORS(app)
@@ -129,6 +128,4 @@ def simplify_sentence():
 
 
 if __name__ == '__main__':
-    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    context.load_cert_chain(certfile='cert.pem', keyfile='key.pem')
-    serve(app, host='0.0.0.0', port=8000, ssl_context=context)
+    app.run(debug=True)
