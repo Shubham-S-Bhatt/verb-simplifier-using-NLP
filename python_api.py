@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 import numpy as np
 import tensorflow as tf
@@ -10,7 +10,8 @@ from difflib import get_close_matches
 
 
 app = Flask(__name__)
-CORS(app)
+
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Load spaCy model
 nlp = spacy.load('en_core_web_sm')
@@ -39,7 +40,6 @@ simple_verbs = [
     "throw", "catch", "build", "destroy", "drive", "fly", "swim", "draw",
     "paint", "count", "measure", "mix", "cook", "clean", "wash", "repair",
     "jump", "climb", "sing", "dance", "laugh", "cry", "smile", "frown",
-    "shout", "whisper", "play", "rest", "travel", "capture", "ensure"
 ]
 
 # Utility function to count syllables
@@ -69,12 +69,38 @@ def predict(input_embedding):
 
 
 def conjugate_stem_verb(verb, condition_verb):
-    if condition_verb.endswith('ies') and verb.endswith(('ay', 'ey', 'iy', 'oy', 'uy') ):  # Handles consonant + y
+    if condition_verb.endswith('ies') and verb.endswith(('ay', 'ey', 'iy', 'oy', 'uy')):  # Handles consonant + y
         return verb[:-1] + 'ies'
     elif condition_verb.endswith('es') and verb.endswith(('sh', 'ch', 's', 'z', 'x')):  # Handles sibilant sounds
         return verb + 'es'
+    elif condition_verb.endswith('e'):
+        return verb
+    elif condition_verb.endswith('ing') and verb.endswith('ee'):
+        return verb + 'ing'
+    elif condition_verb.endswith('ing') and verb.endswith('ie'):
+        return verb[:-2] + 'ying'
+    elif condition_verb.endswith('ing') and verb.endswith(('w', 'x', 'y')):
+        return verb + 'ing'
+    elif condition_verb.endswith('ing') and verb.endswith('ic'):
+        return verb + 'king'
+    elif condition_verb.endswith('ing') and len(re.findall(r'[aeiou]', verb)) == 2:
+        if verb.endswith(('a', 'e', 'i', 'o', 'u')):
+            return verb + 'ing'
+        elif verb[-1] not in 'aeiou':
+            return verb + verb[-1] + 'ing'
+    elif condition_verb.endswith('ing') and len(re.findall(r'[aeiou]', verb)) == 1 and len(verb) >= 3:
+        if re.match(r'[^aeiou][aeiou][^aeiou]$', verb):
+            return verb + verb[-1] + 'ing'
+    elif condition_verb.endswith('ing') and verb.endswith(('a', 'e', 'i', 'o', 'u')):
+        return verb[:-2] + 'ying'
+    elif condition_verb.endswith('ing') and verb.endswith('e'):
+        return verb[:-1] + 'ing'
+    elif condition_verb.endswith('ing'):
+        return verb + 'ing'
     else:
         return verb + 's'  # Default rule for third-person singular
+    return verb  # Return the original verb as a fallback
+
 
 
 
@@ -93,8 +119,15 @@ def find_closest_word(predicted_embedding):
 
     return closest_word
 
-@app.route('/simplify_sentence', methods=['POST'])
+
+
+
+
+@app.route('/simplify_sentence', methods=['OPTIONS','POST'])
 def simplify_sentence():
+    if request.method == 'OPTIONS':
+        return build_cors_preflight_response()
+
     sentence = request.json['sentence']
     doc = nlp(sentence)
     simplified_sentence = sentence
@@ -103,8 +136,9 @@ def simplify_sentence():
         if token.pos_ == "VERB":
             lemma = token.lemma_
             embedding = get_embedding(lemma)
-            
+            print("here1")
             if np.any(embedding):  # Check if it's not the zero vector
+                print("here2")
                 predicted_embedding = predict(embedding)
                 closest_verb = find_closest_word(predicted_embedding)
                 
@@ -115,17 +149,29 @@ def simplify_sentence():
                         # If not a verb, find the most similar verb from the simple_verbs list
                         closest_verb = get_close_matches(closest_verb, simple_verbs, n=1, cutoff=0.6)
                         closest_verb = closest_verb[0] if closest_verb else None
-                    
-                    if closest_verb:
-                        print("original word:", token.text)
-                        conjugated_verb = conjugate_stem_verb(closest_verb, token.text)
-                        print("conjugated verb:", conjugated_verb)
-                        simplified_sentence = simplified_sentence.replace(token.text, conjugated_verb)
+                    print("original word:", token.text)
+                    print("closest verb:", closest_verb)
+
+                    conjugated_verb = conjugate_stem_verb(closest_verb, token.text)
+                    print("conjugated verb:", conjugated_verb)
+                    simplified_sentence = simplified_sentence.replace(token.text, conjugated_verb)
     
     return jsonify({'simplified_sentence': simplified_sentence})
 
 
 
 
+
+def build_cors_preflight_response():
+    response = make_response()
+    response.headers.add("Access-Control-Allow-Origin", "https://shubham-s-bhatt.github.io")
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type")
+    response.headers.add("Access-Control-Allow-Methods", "POST, OPTIONS")
+    return response
+
+
+
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, ssl_context=('cert.pem', 'key.pem'))
