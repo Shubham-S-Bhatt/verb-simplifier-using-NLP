@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+_pycache_/
+venv/
+=======
 venv/
 env
 _pycache_/
+>>>>>>> 6464b310ea42ee904b4d524e4418eac1c99489a9
