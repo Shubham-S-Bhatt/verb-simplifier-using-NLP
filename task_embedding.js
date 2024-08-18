@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('original-sentence-embedding').innerText = sentence;
         console.log("Original sentence:", sentence);
         
-        const response = await fetch('https://127.0.0.1:5000/simplify_sentence', {
+        const response = await fetch('https://192.168.111.222:5000/simplify_sentence', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
