@@ -15,8 +15,6 @@
         <div class="container">
             <h1>Verb Simplification using Word Embedding with GloVe 300d model</h1>
             
-            <div id="training-message-embedding" class="alert">Model is being trained, please wait...</div>
-            
             <div class="input-group">
                 <label for="sentence-input-embedding">Enter a sentence:</label>
                 <input type="text" id="sentence-input-embedding" placeholder="Type your sentence here...">
@@ -25,8 +23,14 @@
             <button id="simplify-button-embedding" onclick="simplifyInputSentenceEmbedded()">Simplify Sentence</button>
             
             <div class="output-group">
-                <p><strong>Original Sentence:</strong> <span id="original-sentence-embedding"></span></p>
-                <p><strong>Simplified Sentence:</strong> <span id="simplified-sentence-embedding"></span></p>
+                <p class="original_text_wrapper">
+                    <strong>Original Sentence:</strong> 
+                    <span id="original-sentence-embedding"></span>
+                </p>
+                <p class="simplified_text_wrapper">
+                    <strong>Simplified Sentence:</strong> 
+                    <span id="simplified-sentence-embedding"></span>
+                </p>
             </div>
         </div>
 

@@ -18,6 +18,7 @@ body {
     text-align: center;
     width: 80%;
     min-height: 450px;
+    top: 80px;
 }
 
 h1 {
@@ -38,7 +39,7 @@ h1 {
 }
 
 .input-group {
-    margin-bottom: 20px;
+    margin-bottom: 40px;
 }
 
 label {
@@ -63,7 +64,7 @@ input[type="text"]:disabled {
 }
 
 button {
-    background-color: #007bff;
+    background-color: #002e5f;
     color: #fff;
     border: none;
     border-radius: 5px;
@@ -83,8 +84,15 @@ button:hover:not(:disabled) {
 }
 
 .output-group {
-    margin-top: 20px;
+    margin: 50px 0px 0px 0px;
     text-align: left;
+}
+
+
+.original_text_wrapper {
+    background: grey;
+    border-radius: 5px;
+    color: white;
 }
 
 .output-group p {
