@@ -192,7 +192,5 @@ def build_cors_preflight_response():
 
 
 
-
-
 if __name__ == '__main__':
     app.run(debug=True, ssl_context=('cert.pem', 'key.pem'))
