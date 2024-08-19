@@ -40,7 +40,27 @@ simple_verbs = [
     "throw", "catch", "build", "destroy", "drive", "fly", "swim", "draw",
     "paint", "count", "measure", "mix", "cook", "clean", "wash", "repair",
     "jump", "climb", "sing", "dance", "laugh", "cry", "smile", "frown",
+    "plan", "arrive", "depart", "answer", "talk", "explain", "show", "watch",
+    "play", "fix", "use", "borrow", "lend", "borrow", "send", "receive",
+    "invite", "reply", "shout", "whisper", "yell", "ask", "answer", "teach",
+    "learn", "draw", "color", "build", "destroy", "hide", "find", "play",
+    "repair", "cook", "clean", "buy", "sell", "throw", "catch", "cut", "grow",
+    "sleep", "wake", "dream", "eat", "drink", "run", "walk", "jump", "sit",
+    "stand", "fall", "stay", "leave", "hold", "drop", "give", "take", "lose",
+    "win", "speak", "listen", "drive", "stop", "start", "begin", "end", "open",
+    "close", "look", "see", "hear", "touch", "taste", "smell", "feel", "run",
+    "jump", "laugh", "cry", "smile", "think", "know", "believe", "hope", "plan",
+    "forget", "remember", "learn", "study", "teach", "work", "play", "relax",
+    "read", "write", "count", "talk", "say", "tell", "ask", "answer", "help",
+    "try", "change", "keep", "lose", "find", "break", "fix", "grow", "cut",
+    "build", "destroy", "fly", "drive", "walk", "run", "swim", "jump", "throw",
+    "catch", "play", "rest", "travel", "cook", "eat", "drink", "sleep", "wake",
+    "dream", "sit", "stand", "fall", "hold", "drop", "stop", "start", "begin",
+    "end", "open", "close", "look", "watch", "see", "hear", "listen", "touch",
+    "taste", "smell", "feel", "think", "know", "believe", "hope", "plan",
+    "forget", "remember", "study", "learn", "teach", "work", "play", "rest", "ensure", "improve"
 ]
+
 
 # Utility function to count syllables
 def count_syllables(word):
@@ -72,34 +92,26 @@ def conjugate_stem_verb(verb, condition_verb):
     if condition_verb.endswith('ies') and verb.endswith(('ay', 'ey', 'iy', 'oy', 'uy')):  # Handles consonant + y
         return verb[:-1] + 'ies'
     elif condition_verb.endswith('es') and verb.endswith(('sh', 'ch', 's', 'z', 'x')):  # Handles sibilant sounds
-        return verb + 'es'
+        return (verb + 'es')
     elif condition_verb.endswith('e'):
-        return verb
+        return (verb)
     elif condition_verb.endswith('ing') and verb.endswith('ee'):
-        return verb + 'ing'
+        return (verb + 'ing')
     elif condition_verb.endswith('ing') and verb.endswith('ie'):
-        return verb[:-2] + 'ying'
+        return (verb[:-2] + 'ying')
     elif condition_verb.endswith('ing') and verb.endswith(('w', 'x', 'y')):
-        return verb + 'ing'
+        return (verb + 'ing')
     elif condition_verb.endswith('ing') and verb.endswith('ic'):
-        return verb + 'king'
-    elif condition_verb.endswith('ing') and len(re.findall(r'[aeiou]', verb)) == 2:
-        if verb.endswith(('a', 'e', 'i', 'o', 'u')):
-            return verb + 'ing'
-        elif verb[-1] not in 'aeiou':
-            return verb + verb[-1] + 'ing'
-    elif condition_verb.endswith('ing') and len(re.findall(r'[aeiou]', verb)) == 1 and len(verb) >= 3:
-        if re.match(r'[^aeiou][aeiou][^aeiou]$', verb):
-            return verb + verb[-1] + 'ing'
+        return (verb + 'king')
     elif condition_verb.endswith('ing') and verb.endswith(('a', 'e', 'i', 'o', 'u')):
-        return verb[:-2] + 'ying'
+        return (verb[:-2] + 'ying')
     elif condition_verb.endswith('ing') and verb.endswith('e'):
-        return verb[:-1] + 'ing'
+        return (verb[:-1] + 'ing')
     elif condition_verb.endswith('ing'):
-        return verb + 'ing'
+        print("here - ing condition")
+        return (verb + 'ing')
     else:
-        return verb + 's'  # Default rule for third-person singular
-    return verb  # Return the original verb as a fallback
+        return (verb + 's')
 
 
 
@@ -136,26 +148,33 @@ def simplify_sentence():
         if token.pos_ == "VERB":
             lemma = token.lemma_
             embedding = get_embedding(lemma)
-            print("here1")
-            if np.any(embedding):  # Check if it's not the zero vector
-                print("here2")
+            print("verb found", lemma)
+            if np.any(embedding) and lemma not in simple_verbs:  # Check if it's not the zero vector
+                print("embedding found for ", lemma)
                 predicted_embedding = predict(embedding)
                 closest_verb = find_closest_word(predicted_embedding)
-                
+                print("closest verb found", closest_verb)
+
                 # Check if the closest word is a verb
                 if closest_verb:
-                    closest_word_doc = nlp(closest_verb)
-                    if closest_word_doc[0].pos_ != "VERB":
-                        # If not a verb, find the most similar verb from the simple_verbs list
-                        closest_verb = get_close_matches(closest_verb, simple_verbs, n=1, cutoff=0.6)
-                        closest_verb = closest_verb[0] if closest_verb else None
-                    print("original word:", token.text)
-                    print("closest verb:", closest_verb)
-
                     conjugated_verb = conjugate_stem_verb(closest_verb, token.text)
                     print("conjugated verb:", conjugated_verb)
-                    simplified_sentence = simplified_sentence.replace(token.text, conjugated_verb)
-    
+                    closest_word_doc = nlp(conjugated_verb)
+
+                    if closest_word_doc[0].pos_ != "VERB":
+                        print("Predicted verb -", conjugated_verb, "is not a verb")
+                        # If not a verb, find the most similar verb from the simple_verbs list
+                        closest_verb = get_close_matches(conjugated_verb, simple_verbs, n=1, cutoff=0.8)
+                        closest_verb = closest_verb[0] if closest_verb else None
+
+                        print("Updated closest verb", closest_verb)
+
+                    if closest_verb:
+                        simplified_sentence = simplified_sentence.replace(token.text, closest_verb)
+                    elif conjugated_verb:
+                        simplified_sentence = simplified_sentence.replace(token.text, conjugated_verb)
+
+                    print("replaced verb", token.text, "with", conjugated_verb)
     return jsonify({'simplified_sentence': simplified_sentence})
 
 
