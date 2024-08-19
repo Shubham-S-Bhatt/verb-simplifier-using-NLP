@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Highlight the changed words
             changedWords.forEach(([original, simplified]) => {
                 const re = new RegExp(`\\b${simplified}\\b`, 'g');
-                highlightedSentence = highlightedSentence.replace(re, `<span style="background-color: white; color: #ffbb00;">${simplified}</span>`);
+                highlightedSentence = highlightedSentence.replace(re, `<span style="background-color: white; color: #000d1b; padding: 3px 6px; border-radius: 8px; margin: 0px 5px;">${simplified}</span>`);
             });
 
             document.getElementById('simplified-sentence-embedding').innerHTML = highlightedSentence;
