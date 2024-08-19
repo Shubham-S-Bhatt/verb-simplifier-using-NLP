@@ -134,7 +134,6 @@ def find_closest_word(predicted_embedding):
 
 
 
-
 @app.route('/simplify_sentence', methods=['OPTIONS','POST'])
 def simplify_sentence():
     if request.method == 'OPTIONS':
@@ -143,6 +142,7 @@ def simplify_sentence():
     sentence = request.json['sentence']
     doc = nlp(sentence)
     simplified_sentence = sentence
+    changed_words = []  # List to store original and replaced words
     
     for token in doc:
         if token.pos_ == "VERB":
@@ -171,12 +171,14 @@ def simplify_sentence():
 
                     if closest_verb:
                         simplified_sentence = simplified_sentence.replace(token.text, closest_verb)
+                        changed_words.append((token.text, closest_verb))
                     elif conjugated_verb:
                         simplified_sentence = simplified_sentence.replace(token.text, conjugated_verb)
+                        changed_words.append((token.text, conjugated_verb))
 
                     print("replaced verb", token.text, "with", conjugated_verb)
-    return jsonify({'simplified_sentence': simplified_sentence})
-
+    
+    return jsonify({'simplified_sentence': simplified_sentence, 'changed_words': changed_words})
 
 
 

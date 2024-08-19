@@ -29,8 +29,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
             const simplifiedSentence = data.simplified_sentence;
+            const changedWords = data.changed_words; // Get the list of changed words
             console.log("Simplified sentence:", simplifiedSentence);
-            document.getElementById('simplified-sentence-embedding').innerText = simplifiedSentence;
+
+            let highlightedSentence = simplifiedSentence;
+
+            // Highlight the changed words
+            changedWords.forEach(([original, simplified]) => {
+                const re = new RegExp(`\\b${simplified}\\b`, 'g');
+                highlightedSentence = highlightedSentence.replace(re, `<span style="background-color: yellow;">${simplified}</span>`);
+            });
+
+            document.getElementById('simplified-sentence-embedding').innerHTML = highlightedSentence;
         } catch (error) {
             console.error('There was a problem with the fetch operation:', error);
             document.getElementById('simplified-sentence-embedding').innerText = "An error occurred while processing the sentence.";
