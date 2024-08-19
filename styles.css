@@ -14,10 +14,10 @@ body {
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     padding: 40px;
-    max-width: 800px;
+    max-width: 900px;
     text-align: center;
     width: 80%;
-    min-height: 450px;
+    min-height: 430px;
     top: 80px;
     position: relative;
 }
