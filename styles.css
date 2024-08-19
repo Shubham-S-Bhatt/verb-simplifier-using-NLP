@@ -19,6 +19,7 @@ body {
     width: 80%;
     min-height: 450px;
     top: 80px;
+    position: relative;
 }
 
 h1 {
@@ -86,22 +87,21 @@ button:hover:not(:disabled) {
 .output-group {
     margin: 50px 0px 0px 0px;
     text-align: left;
+    font-size: 16px;
 }
 
 
-.original_text_wrapper {
+.text_wrapper {
     background: grey;
     border-radius: 5px;
     color: white;
+    height: 40px;
+    display: flex;
+    margin: 10px 0px;
 }
 
-.output-group p {
-    font-size: 16px;
-    color: #333;
-}
-
-strong {
-    color: #007bff;
+.innerwrapper{
+    margin: auto 10px;
 }
 
 
